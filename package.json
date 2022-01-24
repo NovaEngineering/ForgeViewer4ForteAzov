@@ -1,15 +1,15 @@
 {
-  "name": "forgesample",
+  "name": "markupfromscratch",
   "version": "1.0.0",
-  "description": "Sample application for learnforge.autodesk.io.",
+  "description": "",
   "main": "start.js",
   "scripts": {
-    "start": "node start.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "license": "MIT",
+  "author": "",
+  "license": "ISC",
   "dependencies": {
     "express": "^4.17.2",
-    "forge-apis": "^0.8.0",
-    "multer": "^1.4.0"
+    "forge-apis": "^0.8.6"
   }
 }

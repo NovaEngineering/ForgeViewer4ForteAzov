@@ -1,39 +1,23 @@
-/////////////////////////////////////////////////////////////////////
-// Copyright (c) Autodesk, Inc. All rights reserved
-// Written by Forge Partner Development
-//
-// Permission to use, copy, modify, and distribute this software in
-// object code form for any purpose and without fee is hereby granted,
-// provided that the above copyright notice appears in all copies and
-// that both that copyright notice and the limited warranty and
-// restricted rights notice below appear in all supporting
-// documentation.
-//
-// AUTODESK PROVIDES THIS PROGRAM "AS IS" AND WITH ALL FAULTS.
-// AUTODESK SPECIFICALLY DISCLAIMS ANY IMPLIED WARRANTY OF
-// MERCHANTABILITY OR FITNESS FOR A PARTICULAR USE.  AUTODESK, INC.
-// DOES NOT WARRANT THAT THE OPERATION OF THE PROGRAM WILL BE
-// UNINTERRUPTED OR ERROR FREE.
-/////////////////////////////////////////////////////////////////////
+var express = require('express');
+var ForgeSDK = require('forge-apis');
 
-const path = require('path');
-const express = require('express');
 
-const PORT = process.env.PORT || 3000;
-const config = require('./config');
-if (config.credentials.client_id == null || config.credentials.client_secret == null) {
-    console.error('Missing FORGE_CLIENT_ID or FORGE_CLIENT_SECRET env. variables.');
-    return;
-}
+var forgeClientId = '26FNdMVnqjn59bIXfdMWmUn3MEYNrRjk';
+var forgeClientSecret = 'IKJvSvbJk3l4P7mI';
+var autorefresh = true;
+var scopes = ['viewables:read'];
+var app = express();
 
-let app = express();
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.json({ limit: '50mb' }));
-app.use('/api/forge/oauth', require('./routes/oauth'));
-app.use('/api/forge/oss', require('./routes/oss'));
-app.use('/api/forge/modelderivative', require('./routes/modelderivative'));
-app.use((err, req, res, next) => {
-    console.error(err);
-    res.status(err.statusCode).json(err);
+app.use(express.static(__dirname + '/public'));
+app.set('port', 3007);
+app.get('/token', function (req, res) {
+var oAuth2TwoLegged = new ForgeSDK.AuthClientTwoLegged(forgeClientId, forgeClientSecret, scopes, autorefresh);
+oAuth2TwoLegged.authenticate().then(function(credentials){
+res.json(credentials);
+})
+})
+
+
+var server = app.listen(app.get('port'), function() {
+    console.log('Go to port 3007')
 });
-app.listen(PORT, () => { console.log(`Server listening on port ${PORT}`); });
