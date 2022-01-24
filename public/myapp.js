@@ -5,7 +5,7 @@ function setupViewer(){
        
         Autodesk.Viewing.Initializer(options, function onInitialized() {
             var htmlDiv = document.getElementById("forgeViewer");
-            viewer = new Autodesk.Viewing.GuiViewer3D(htmlDiv, {extensions: ['MarkUp3DExtension']});
+            viewer = new Autodesk.Viewing.GuiViewer3D(htmlDiv, {extensions: ['MarkUp3DExtension', 'GeoThreeExtension']});
             viewer.start(null, null, null, null, {
           webglInitParams: {
             useWebGL2: false
