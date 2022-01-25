@@ -40,4 +40,59 @@ Level of Detail	Map Width and Height (pixels)	Ground Resolution (meters / pixel)
 Широта 47.077542, Долгота 39.531773
 
 https://docs.microsoft.com/en-us/bingmaps/articles/bing-maps-tile-system
+*******************************
+Расчет:
+Исходные данные
+Level of details:7;
+село Кулешовка Азовский район Ростовская область:
+Широта 47.077542, Долгота 39.531773;
 
+////////    1. Рассчитываем размер карты:
+map width = map height = 256 * 2 level pixels
+ширина карты = высота карты = 256*2^7=256*128=32768;
+////////    2. Рассчитываем разрешение карты
+ground resolution = cos(latitude * pi/180) * earth circumference / map width;
+разрешение = cos(47.078*3.14159/180)*(2*3.14159*6378137)/32768=(cos(0.82))*1223=0.999898*1223=1223 - соответствует таблице [1,222.9925]
+earth circumference=2*п*earth radius;
+earth radius = 6378137 meters;
+////////    3. Масштаб карты [map scale]
+map scale = 1 : ground resolution * screen dpi / 0.0254 meters/inch
+= 1 : (cos(latitude * pi/180) * 2 * pi * 6378137 * screen dpi) / (256 * 2 level * 0.0254);
+map scale = 1:[1223*96/0.0254]=1:4622362 **по таблице для level 7 [1 : 4,622,333.68]**  
+*** что такое screen dpi ? ****
+*** У компьютеров с Windows по умолчанию 96 PPI. (пикселей на дюйм). ***
+*** DPI или (Dots Per Inch) «точек на дюйм» ***
+*** ratio -  соотношение ***
+
+///////     4. вычисляе координаты
+sinLatitude = sin(latitude * pi/180)
+sinLatitude = sin(47.077542*3.14159/180)=sin(0.82166)=0.01434;
+pixelX = ((longitude + 180) / 360) * 256 * 2 level
+pixelX = ((39.531773 + 180)/360)*256*128=19982 {точно: 19982.2698268}
+pixelY = (0.5 – log((1 + sinLatitude) / (1 – sinLatitude)) / (4 * pi)) * 256 * 2 level;
+pixelY = {(0.5 - log{(1 + 0.01434)/ (1- 0.01434)}) /(4*3.14159)}*256*128 = {(0.5 - log{1.01434/0.98566})/1256636}*256*128= (0.5-0.0124562)*256*128=15976 [точно: 15975.8352384];
+
+//////      5. Определяем количество плиток карты по ширине и высоте:
+map width = map height = 2 level tiles
+map width = map height = 2^7 ПЛИТОК; Всего 128х128 плиток;
+
+Each tile is given XY coordinates ranging from (0, 0) in the upper left to (2level–1, 2level–1) in the lower right. For example, at level 3 the tile coordinates range from (0, 0) to (7, 7) as follows:
+
+//////      6. Определяем принадлежность координат пары XY плитке
+Given a pair of pixel XY coordinates, you can easily determine the tile XY coordinates of the tile containing that pixel:
+
+tileX = floor(pixelX / 256)
+tileX = floor(19982/256) = floor(78.05) = 78-я плитка;
+tileY = floor(pixelY / 256)
+tileY = floor(15976 / 256) = floor(62.406) = 62-я плитка;
+
+////// 7.Определяем Quadkey 
+https://www.npmjs.com/package/quadkeytools
+Quadkey = 0302201 - что-то я не уверен!
+
+***https://github.com/Autodesk-Forge/forge-extensions/tree/master/public/extensions - googleMap locator***
+
+***https://stackoverflow.com/questions/68122676/maps-into-forge-viewer/68310081?noredirect=1#comment121318690_68310081
+***https://forge.autodesk.com/ja/node/1968
+
+***https://www.politerm.com/zuludoc/tile_format_bing.html - проверь это!
